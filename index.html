@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>St. Joseph's Naggalama ICT Club | Lights, Code, Action</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database-compat.js"></script>
+    <style>
+        /* Custom styles */
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+        }
+        .chat-bubble {
+            border-radius: 20px 20px 20px 0;
+        }
+        .my-chat-bubble {
+            border-radius: 20px 20px 0 20px;
+        }
+        .animated-bg {
+            position: relative;
+            overflow: hidden;
+        }
+        .animated-bg::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.06)" d="M0,128L48,128C96,128,192,128,288,160C384,192,480,256,576,277.3C672,299,768,277,864,250.7C960,224,1056,192,1152,192C1248,192,1344,224,1392,240L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>');
+            background-size: cover;
+            opacity: 1;
+            animation: wave 20s linear infinite;
+        }
+        @keyframes wave {
+            0% { background-position: 0 0; }
+            100% { background-position: 1440px 0; }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+    </script>
+
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-laptop-code text-2xl"></i>
+                    <span class="text-xl font-bold">St. Joseph's ICT Club</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#home" class="hover:text-blue-200 transition">Home</a>
+                    <a href="#about" class="hover:text-blue-200 transition">About</a>
+                    <a href="#projects" class="hover:text-blue-200 transition">Projects</a>
+                    <a href="#events" class="hover:text-blue-200 transition">Events</a>
+                    <a href="#chat" class="hover:text-blue-200 transition">Club Chat</a>
+                    <a href="#contact" class="hover:text-blue-200 transition">Contact</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-white focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden gradient-bg px-4 pb-4">
+            <a href="#home" class="block py-2 hover:text-blue-200 transition">Home</a>
+            <a href="#about" class="block py-2 hover:text-blue-200 transition">About</a>
+            <a href="#projects" class="block py-2 hover:text-blue-200 transition">Projects</a>
+            <a href="#events" class="block py-2 hover:text-blue-200 transition">Events</a>
+            <a href="#chat" class="block py-2 hover:text-blue-200 transition">Club Chat</a>
+            <a href="#contact" class="block py-2 hover:text-blue-200 transition">Contact</a>
+            <button id="login-btn-mobile" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition w-full">Login / Register</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="animated-bg gradient-bg text-white py-20 relative">
+        <div class="container mx-auto px-4 flex flex-col items-center text-center relative z-10">
+            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-laptop-code text-blue-600 text-4xl"></i>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">St. Joseph's Naggalama <span class="text-yellow-300">ICT Club</span></h1>
+            <p class="text-xl md:text-2xl mb-8">Lights, Code, Action!</p>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                <button id="login-btn" class="bg-white text-blue-600 hover:bg-blue-100 px-8 py-3 rounded-full font-semibold transition">Login / Register</button>
+                <a href="#about" class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-600 text-white px-8 py-3 rounded-full font-semibold transition">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">About Our ICT Club</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0 md:pr-8">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Our Mission</h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        The St. Joseph's Naggalama ICT Club is dedicated to fostering innovation, creativity, and technical skills among students. 
+                        We believe in the power of technology to transform lives and communities.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed">
+                        Our motto "Lights, Code, Action" represents our approach: Illuminate ideas with knowledge (Lights), develop solutions through programming (Code), 
+                        and implement real-world projects (Action).
+                    </p>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="bg-gray-100 rounded-xl overflow-hidden">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" 
+                                 alt="ICT Club members" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md card-hover">
+                    <div class="text-blue-600 text-3xl mb-4">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Lights</h3>
+                    <p class="text-gray-600">Ignite your creativity and problem-solving skills through brainstorming sessions and tech workshops.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md card-hover">
+                    <div class="text-blue-600 text-3xl mb-4">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Code</h3>
+                    <p class="text-gray-600">Develop practical coding skills through hands-on projects in web development, mobile apps, and more.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md card-hover">
+                    <div class="text-blue-600 text-3xl mb-4">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Action</h3>
+                    <p class="text-gray-600">Implement your ideas and see them come to life while making a real impact in our community.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Projects</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-4">Explore some of the innovative projects we're currently working on or have completed.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <div class="h-48 bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-school text-blue-600 text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">School Management System</h3>
+                        <p class="text-gray-600 mb-4">A digital solution to streamline school operations including attendance, grading, and communication.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">In Progress</span>
+                            <span>70% complete</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <div class="h-48 bg-green-100 flex items-center justify-center">
+                        <i class="fas fa-recycle text-green-600 text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">E-Waste Awareness App</h3>
+                        <p class="text-gray-600 mb-4">Mobile application to educate the community about proper electronic waste disposal methods.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded mr-2">Completed</span>
+                            <span>Launched Oct 2023</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl overflow-hidden shadow-md card-hover">
+                    <div class="h-48 bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-book-open text-purple-600 text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">Digital Library Platform</h3>
+                        <p class="text-gray-600 mb-4">An online portal providing access to educational resources and books for students.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded mr-2">Planning</span>
+                            <span>Starting Jan 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Upcoming Events</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-blue-50 rounded-xl overflow-hidden">
+                    <div class="p-6 flex items-start">
+                        <div class="bg-blue-600 text-white rounded-lg p-4 text-center mr-6">
+                            <div class="text-2xl font-bold">15</div>
+                            <div class="text-sm">NOV</div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Annual Hackathon 2023</h3>
+                            <p class="text-gray-600 mb-4">A 24-hour coding challenge where teams compete to build innovative solutions to community problems.</p>
+                            <div class="flex items-center text-sm text-blue-600">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span>9:00 AM - School Computer Lab</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-purple-50 rounded-xl overflow-hidden">
+                    <div class="p-6 flex items-start">
+                        <div class="bg-purple-600 text-white rounded-lg p-4 text-center mr-6">
+                            <div class="text-2xl font-bold">05</div>
+                            <div class="text-sm">DEC</div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Tech Career Day</h3>
+                            <p class="text-gray-600 mb-4">Guest speakers from the tech industry share their experiences and career advice.</p>
+                            <div class="flex items-center text-sm text-purple-600">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span>2:00 PM - School Hall</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 rounded-xl overflow-hidden">
+                    <div class="p-6 flex items-start">
+                        <div class="bg-green-600 text-white rounded-lg p-4 text-center mr-6">
+                            <div class="text-2xl font-bold">12</div>
+                            <div class="text-sm">JAN</div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Python Workshop</h3>
+                            <p class="text-gray-600 mb-4">Beginner-friendly session to learn Python programming fundamentals.</p>
+                            <div class="flex items-center text-sm text-green-600">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span>3:30 PM - Computer Lab 2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 rounded-xl overflow-hidden">
+                    <div class="p-6 flex items-start">
+                        <div class="bg-yellow-600 text-white rounded-lg p-4 text-center mr-6">
+                            <div class="text-2xl font-bold">30</div>
+                            <div class="text-sm">JAN</div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Website Design Competition</h3>
+                            <p class="text-gray-600 mb-4">Create the best website showcasing our school's activities.</p>
+                            <div class="flex items-center text-sm text-yellow-600">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span>Submissions Due</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Club Chat Section -->
+    <section id="chat" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Club Chat</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-4">Connect with fellow members, share ideas, and get updates on projects (login required).</p>
+            </div>
+
+            <!-- Login/Register Modal (hidden by default) -->
+            <div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800">Welcome Back</h3>
+                        <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="login-form">
+                        <div class="mb-4">
+                            <label for="email" class="block text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="password" class="block text-gray-700 mb-2">Password</label>
+                            <input type="password" id="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition mb-4">
+                            Login
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mb-4 relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center">
+                            <span class="bg-white px-2 text-gray-500">or</span>
+                        </div>
+                    </div>
+                    
+                    <button id="show-register" class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition">
+                        Create New Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Register Modal (hidden by default) -->
+            <div id="register-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800">Join Our Club</h3>
+                        <button id="close-register-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="register-form">
+                        <div class="mb-4">
+                            <label for="reg-name" class="block text-gray-700 mb-2">Full Name</label>
+                            <input type="text" id="reg-name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="reg-email" class="block text-gray-700 mb-2">Email</label>
+                            <input type="email" id="reg-email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="reg-class" class="block text-gray-700 mb-2">Class/Grade</label>
+                            <input type="text" id="reg-class" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="reg-password" class="block text-gray-700 mb-2">Password</label>
+                            <input type="password" id="reg-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition mb-4">
+                            Register
+                        </button>
+                    </form>
+                    
+                    <div class="text-center relative">
+                        <p class="text-gray-600 mb-2">Already have an account?</p>
+                        <button id="show-login" class="text-blue-600 hover:text-blue-800">
+                            Login here
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Interface (hidden until login) -->
+            <div id="chat-interface" class="hidden bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="flex flex-col h-96">
+                    <!-- Chat Header -->
+                    <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold">ICT Club Discussions</h3>
+                            <p class="text-sm text-blue-100">Active members: <span id="members-count">0</span></p>
+                        </div>
+                        <button id="logout-btn" class="text-white hover:text-blue-200 text-sm">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                        </button>
+                    </div>
+                    
+                    <!-- Messages Area -->
+                    <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                        <!-- Messages will appear here -->
+                        <div class="welcome-message text-center py-8">
+                            <i class="fas fa-comments text-blue-200 text-4xl mb-2"></i>
+                            <h4 class="text-xl font-semibold text-gray-700">Welcome to ICT Club Chat</h4>
+                            <p class="text-gray-500">Share project updates, ask questions, and collaborate with members.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Message Input Area -->
+                    <div class="bg-white border-t p-4">
+                        <form id="message-form" class="flex space-x-2">
+                            <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="submit" class="bg-blue-600 text-white px-4 rounded-full hover:bg-blue-700 transition">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                        <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                            <div id="typing-indicator"></div>
+                            <div>Press Enter to send</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Closed Chat Preview -->
+            <div id="chat-preview" class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="flex flex-col h-64">
+                    <div class="bg-blue-600 text-white p-4 text-center">
+                        <h3 class="font-semibold">Club Chat is for Members Only</h3>
+                        <p class="text-sm text-blue-100">Login or register to join the conversation</p>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center bg-gray-50">
+                        <div class="text-center p-4">
+                            <i class="fas fa-lock text-blue-600 text-4xl mb-4"></i>
+                            <button id="preview-login-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                Login to Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Contact Us</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/2 bg-blue-50 rounded-xl p-8">
+                    <h3 class="text-xl font-semibold mb-4">Get In Touch</h3>
+                    <form id="contact-form">
+                        <div class="mb-4">
+                            <label for="contact-name" class="block text-gray-700 mb-2">Name</label>
+                            <input type="text" id="contact-name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="contact-email" class="block text-gray-700 mb-2">Email</label>
+                            <input type="email" id="contact-email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="contact-message" class="block text-gray-700 mb-2">Message</label>
+                            <textarea id="contact-message" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="md:w-1/2">
+                    <div class="bg-gray-50 rounded-xl p-8 h-full">
+                        <h3 class="text-xl font-semibold mb-4">Club Information</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="text-blue-600 mr-4 mt-1">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Location</h4>
+                                    <p class="text-gray-600">St. Joseph's Senior Secondary School, Naggalama</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="text-blue-600 mr-4 mt-1">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Meeting Times</h4>
+                                    <p class="text-gray-600">Every Wednesday, 2:30 PM - 4:00 PM</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="text-blue-600 mr-4 mt-1">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Email</h4>
+                                    <p class="text-gray-600">ictclub@sjnss.sc.ug</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h4 class="font-medium text-gray-800 mb-4">Follow Us</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center">
+                        <i class="fas fa-laptop-code text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">St. Joseph's ICT Club</span>
+                    </div>
+                    <p class="text-blue-200 mt-1">Lights, Code, Action!</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row md:space-x-6 text-center md:text-left">
+                    <div class="mb-3 md:mb-0">
+                        <h4 class="font-semibold mb-2">Quick Links</h4>
+                        <ul class="space-y-1">
+                            <li><a href="#home" class="text-blue-200 hover:text-white transition">Home</a></li>
+                            <li><a href="#projects" class="text-blue-200 hover:text-white transition">Projects</a></li>
+                            <li><a href="#events" class="text-blue-200 hover:text-white transition">Events</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-2">Connect</h4>
+                        <ul class="space-y-1">
+                            <li><a href="#contact" class="text-blue-200 hover:text-white transition">Contact</a></li>
+                            <li><a href="#chat" class="text-blue-200 hover:text-white transition">Club Chat</a></li>
+                            <li><a href="#" class="text-blue-200 hover:text-white transition">Club Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-blue-400 mt-6 pt-6 text-sm text-center text-blue-200">
+                <p>&copy; 2023 St. Joseph's Naggalama ICT Club. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Firebase Authentication and Database handlers
+        let currentUser = null;
+        let membersOnline = [];
+        let isTyping = false;
+        let typingTimeout;
+        
+        // Listen for authentication state changes
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = {
+                    uid: user.uid,
+                    email: user.email,
+                    name: user.displayName || 'Anonymous',
+                    class: user.class || 'Member'
+                };
+                
+                chatPreview.classList.add('hidden');
+                chatInterface.classList.remove('hidden');
+                
+                // Set up chat listeners
+                setupChatListeners();
+                
+                // Update online status
+                updateOnlineStatus(true);
+            } else {
+                currentUser = null;
+                chatInterface.classList.add('hidden');
+                chatPreview.classList.remove('hidden');
+                
+                // Clean up chat listeners
+                if (typeof chatRefOff === 'function') {
+                    chatRefOff();
+                }
+            }
+        });
+        
+        function updateOnlineStatus(isOnline) {
+            if (!currentUser) return;
+            
+            const userStatusRef = database.ref('status/' + currentUser.uid);
+            const statusRef = database.ref('.info/connected');
+            
+            statusRef.on('value', (snapshot) => {
+                if (snapshot.val() === false) return;
+                
+                userStatusRef.onDisconnect().set({
+                    online: false,
+                    lastChanged: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => {
+                    userStatusRef.set({
+                        online: isOnline,
+                        name: currentUser.name,
+                        lastChanged: firebase.database.ServerValue.TIMESTAMP
+                    });
+                });
+            });
+        }
+        
+        function setupChatListeners() {
+            // Listen for online members
+            database.ref('status').orderByChild('online').equalTo(true)
+                .on('value', (snapshot) => {
+                    const members = [];
+                    snapshot.forEach((childSnapshot) => {
+                        if (childSnapshot.key !== currentUser.uid) {
+                            members.push(childSnapshot.val().name);
+                        }
+                    });
+                    membersOnline = members;
+                    document.getElementById('members-count').textContent = membersOnline.length;
+                });
+            
+            // Listen for new messages
+            chatRef = database.ref('messages').limitToLast(50);
+            chatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                addMessageToUI(message);
+            });
+        }
+        
+        function addMessageToUI(message) {
+            const messagesContainer = document.getElementById('messages-container');
+            const messageDiv = document.createElement('div');
+            
+            if (message.uid === currentUser.uid) {
+                messageDiv.className = 'flex justify-end';
+                messageDiv.innerHTML = `
+                    <div class="my-chat-bubble bg-blue-600 text-white p-4 max-w-xs md:max-w-md">
+                        <p>${message.text}</p>
+                        <div class="text-xs opacity-75 mt-1 flex justify-end items-center">
+                            <span>${formatTime(message.timestamp)}</span>
+                            <i class="fas fa-check ml-1 text-xs"></i>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.className = 'flex';
+                messageDiv.innerHTML = `
+                    <div class="chat-bubble bg-white p-4 max-w-xs md:max-w-md shadow-sm">
+                        <p class="text-gray-800 font-medium">${message.name}</p>
+                        <p class="text-gray-600 mt-1">${message.text}</p>
+                        <div class="text-xs text-gray-400 mt-1">
+                            ${formatTime(message.timestamp)}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function formatTime(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        // Authentication modal
+        const loginBtn = document.getElementById('login-btn');
+        const previewLoginBtn = document.getElementById('preview-login-btn');
+        const loginBtnMobile = document.getElementById('login-btn-mobile');
+        const authModal = document.getElementById('auth-modal');
+        const registerModal = document.getElementById('register-modal');
+        const closeModal = document.getElementById('close-modal');
+        const closeRegisterModal = document.getElementById('close-register-modal');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        const chatInterface = document.getElementById('chat-interface');
+        const chatPreview = document.getElementById('chat-preview');
+
+        // Simulated users
+        const users = {
+            'admin@sjict.com': {
+                name: 'ICT Admin',
+                password: 'admin123',
+                class: 'Staff'
+            },
+            'member@sjict.com': {
+                name: 'John Member',
+                password: 'member123',
+                class: 'S5'
+            }
+        };
+
+        let currentUser = null;
+        let membersOnline = 0;
+        let isTyping = false;
+        let typingTimeout;
+
+        // Open login modal
+        function showLoginModal() {
+            authModal.classList.remove('hidden');
+            registerModal.classList.add('hidden');
+        }
+
+        loginBtn.addEventListener('click', showLoginModal);
+        previewLoginBtn.addEventListener('click', showLoginModal);
+        loginBtnMobile.addEventListener('click', showLoginModal);
+
+        // Close modal
+        closeModal.addEventListener('click', function() {
+            authModal.classList.add('hidden');
+        });
+
+        // Show register form
+        showRegister.addEventListener('click', function() {
+            authModal.classList.add('hidden');
+            registerModal.classList.remove('hidden');
+        });
+
+        // Close register modal
+        closeRegisterModal.addEventListener('click', function() {
+            registerModal.classList.add('hidden');
+        });
+
+        // Show login from register
+        showLogin.addEventListener('click', function() {
+            registerModal.classList.add('hidden');
+            authModal.classList.remove('hidden');
+        });
+
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    authModal.classList.add('hidden');
+                })
+                .catch((error) => {
+                    alert('Login failed: ' + error.message);
+                });
+        });
+
+        // Register form submission
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const studentClass = document.getElementById('reg-class').value;
+            const password = document.getElementById('reg-password').value;
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Update user profile
+                    return userCredential.user.updateProfile({
+                        displayName: name
+                    }).then(() => {
+                        // Store additional user data
+                        return database.ref('users/' + userCredential.user.uid).set({
+                            name: name,
+                            class: studentClass,
+                            email: email
+                        });
+                    });
+                })
+                .then(() => {
+                    alert('Registration successful! You are now logged in.');
+                    registerModal.classList.add('hidden');
+                })
+                .catch((error) => {
+                    alert('Registration failed: ' + error.message);
+                });
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            updateOnlineStatus(false);
+            auth.signOut();
+        });
+
+        // Simulate typing indicator
+        document.getElementById('message-input').addEventListener('input', function() {
+            if (!isTyping) {
+                isTyping = true;
+                document.getElementById('typing-indicator').textContent = "You're typing...";
+            }
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(function() {
+                isTyping = false;
+                document.getElementById('typing-indicator').textContent = "";
+            }, 1000);
+        });
+
+        // Chat message submission
+        document.getElementById('message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message && currentUser) {
+                // Push message to Firebase
+                database.ref('messages').push({
+                    uid: currentUser.uid,
+                    name: currentUser.name,
+                    text: message,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                
+                input.value = '';
+            }
+        });
+
+        // Contact form submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! We will get back to you soon.');
+            e.target.reset();
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=Jerrypro/ictclub" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
